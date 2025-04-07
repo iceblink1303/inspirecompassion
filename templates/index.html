@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Initiation à l'autocompassion - Jour {{ jour }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <h1>🌱 Pratique du jour : Jour {{ jour }}</h1>
+    <p>{{ pratique }}</p>
+
+    {% if deja_fait %}
+        <p style="color: green;"><strong>✨ Tu as déjà fait la pratique du jour. Reviens demain 🌞</strong></p>
+    {% else %}
+        <form method="POST">
+            <label for="feedback">Comment te sens-tu après cette pratique ?</label><br>
+            <textarea name="feedback" rows="4" cols="50" required></textarea><br><br>
+            <button type="submit">Valider</button>
+        </form>
+    {% endif %}
+<div class="message-inspiration" style="margin-bottom: 20px; font-size: 1.2em; color: #444;">
+  🌞 Chaque jour est une graine de douceur à semer. Merci d’être là.
+</div>
+</body>
+</html>
