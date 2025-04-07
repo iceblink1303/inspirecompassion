@@ -2,11 +2,15 @@ import os
 from flask import Flask, render_template, request, redirect
 from datetime import datetime
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+
 
 app = Flask(__name__)
 
 # Charger les pratiques
-with open("pratiques.txt", "r", encoding="utf-8") as f:
+with open(os.path.join(BASE_DIR, "pratiques.txt"), "r", encoding="utf-8") as f:
     pratiques = [p.strip() for p in f.readlines() if p.strip()]
 
 # Lire ou initialiser le jour
