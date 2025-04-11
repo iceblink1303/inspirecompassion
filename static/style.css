@@ -1,51 +1,49 @@
+
 body {
     font-family: 'Segoe UI', sans-serif;
-    background-color: #fefcf8;
-    color: #222;
-    padding: 40px;
-    max-width: 700px;
-    margin: auto;
+    background-color: #f2fdf5;
+    color: #2f4f2f;
+    margin: 0;
+    padding: 0;
 }
-
-h1 {
-    color: #1f4b2e;
-    font-size: 2em;
-    margin-bottom: 10px;
+.container {
+    max-width: 600px;
+    margin: 3em auto;
+    padding: 2em;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
 }
-
-p {
-    font-size: 1.2em;
+h1, h2 {
+    color: #3a7f59;
 }
-
-form {
-    margin-top: 20px;
+label, p, li {
+    font-size: 1.1em;
+    margin-top: 1em;
 }
-
-textarea {
+input, textarea, select, button {
     width: 100%;
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    font-size: 1em;
+    padding: 0.6em;
+    margin-top: 0.5em;
+    border: 1px solid #cde3d1;
+    border-radius: 8px;
 }
-
 button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    background-color: #1f4b2e;
-    color: white;
+    background-color: #a5d6a7;
     border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 1em;
-}
-
-button:hover {
-    background-color: #306c49;
-}
-
-.success {
-    color: green;
+    color: white;
     font-weight: bold;
-    margin-top: 20px;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #81c784;
+}
+.gamification {
+    background-color: #e8f5e9;
+    padding: 1em;
+    margin-top: 2em;
+    border-left: 4px solid #66bb6a;
+}
+.feedbacks {
+    margin-top: 2em;
 }
