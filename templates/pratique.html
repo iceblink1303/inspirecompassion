@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Pratique du jour</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Pratique du jour : Jour {{ day }}</h1>
+        <p>{{ practice }}</p>
+
+        {% if gamification %}
+            <div class="gamification">
+                <h2>🎉 Félicitations pour ta régularité ! 🎉</h2>
+                <p>Voici une ressource inspirante pour toi :</p>
+                <a href="https://self-compassion.org" target="_blank">Découvrir une méditation</a>
+            </div>
+        {% endif %}
+
+        <form method="POST">
+            <label for="feedback">Comment s'est passée ta pratique ?</label><br>
+            <textarea id="feedback" name="feedback" rows="4" cols="50"></textarea><br>
+            <button type="submit">Envoyer mon retour</button>
+        </form>
+
+        {% if feedbacks %}
+            <div class="feedbacks">
+                <h2>Retours précédents :</h2>
+                <ul>
+                    {% for fb in feedbacks %}
+                        <li>{{ fb }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
