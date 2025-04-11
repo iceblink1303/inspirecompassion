@@ -1,71 +1,78 @@
-import os
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for, session
 from datetime import datetime
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-
-
+import os
+import json
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "votre_cle_secrete_a_changer")
 
-# Charger les pratiques
-with open(os.path.join(BASE_DIR, "pratiques.txt"), "r", encoding="utf-8") as f:
-    pratiques = [p.strip() for p in f.readlines() if p.strip()]
+# Charger les pratiques depuis un fichier texte
+with open("pratiques_autocompassion_par_niveaux.txt", "r", encoding="utf-8") as f:
+    pratiques = [ligne.strip() for ligne in f.readlines() if ligne.strip()]
 
-# Lire ou initialiser le jour
-def get_jour():
-    if os.path.exists("jour_en_cours.txt"):
-        with open("jour_en_cours.txt", "r") as f:
-            return int(f.read().strip())
-    else:
-        return 1
+# Fichier JSON pour enregistrer les utilisateurs
+UTILISATEURS_FILE = "utilisateurs.json"
 
-# Sauver le jour suivant
-def save_jour(jour):
-    with open("jour_en_cours.txt", "w") as f:
-        f.write(str(jour))
+# Charger ou initialiser les utilisateurs
+if os.path.exists(UTILISATEURS_FILE):
+    with open(UTILISATEURS_FILE, "r", encoding="utf-8") as f:
+        utilisateurs = json.load(f)
+else:
+    utilisateurs = {}
 
-# Sauver le feedback
-def save_feedback(jour, feedback):
-    date = datetime.now().strftime("%Y-%m-%d")
-    with open("feedbacks.txt", "a", encoding="utf-8") as f:
-        f.write(f"{date} - Jour {jour} : {feedback}\n")
-
-def get_last_access_date():
-    if os.path.exists("dernier_acces.txt"):
-        with open("dernier_acces.txt", "r") as f:
-            return f.read().strip()
-    return None
-
-def set_last_access_date(date_str):
-    with open("dernier_acces.txt", "w") as f:
-        f.write(date_str)
-
+def sauvegarder_utilisateurs():
+    with open(UTILISATEURS_FILE, "w", encoding="utf-8") as f:
+        json.dump(utilisateurs, f, indent=2, ensure_ascii=False)
 
 @app.route("/", methods=["GET", "POST"])
-def index():
-    aujourd_hui = datetime.now().strftime("%Y-%m-%d")
-    dernier_acces = get_last_access_date()
-    jour = get_jour()
+def accueil():
+    if request.method == "POST":
+        surnom = request.form.get("username", "").strip().lower()
+        est_revenu = request.form.get("visited") == "oui"
+        jour_saisi = request.form.get("last_day")
 
-    # Si on est encore le même jour, ne pas avancer
-    if dernier_acces == aujourd_hui:
-        pratique = pratiques[jour - 1] if jour <= len(pratiques) else "Toutes les pratiques ont été faites 🌟"
-        deja_fait = True
-    else:
-        pratique = pratiques[jour - 1] if jour <= len(pratiques) else "Toutes les pratiques ont été faites 🌟"
-        deja_fait = False
+        if surnom:
+            if surnom not in utilisateurs:
+                utilisateurs[surnom] = {
+                    "dernier_jour": int(jour_saisi) if jour_saisi else 1,
+                    "feedbacks": {}
+                }
+            else:
+                if jour_saisi:
+                    utilisateurs[surnom]["dernier_jour"] = int(jour_saisi)
 
-    if request.method == "POST" and not deja_fait:
-        feedback = request.form.get("feedback")
+            sauvegarder_utilisateurs()
+            session["surnom"] = surnom
+            return redirect(url_for("pratique"))
+
+    return render_template("accueil.html")
+
+@app.route("/pratique", methods=["GET", "POST"])
+def pratique():
+    surnom = session.get("surnom")
+    if not surnom or surnom not in utilisateurs:
+        return redirect(url_for("accueil"))
+
+    utilisateur = utilisateurs[surnom]
+    jour = utilisateur["dernier_jour"]
+    pratique_du_jour = pratiques[jour - 1] if jour <= len(pratiques) else "Tu as complété toutes les pratiques !"
+
+    if request.method == "POST":
+        feedback = request.form.get("feedback", "").strip()
+        horodatage = datetime.now().strftime("%Y-%m-%d %H:%M")
         if feedback:
-            save_feedback(jour, feedback)
-            save_jour(jour + 1)
-            set_last_access_date(aujourd_hui)
-        return redirect("/")
+            utilisateur["feedbacks"].setdefault(str(jour), []).append({
+                "texte": feedback,
+                "date": horodatage
+            })
+            sauvegarder_utilisateurs()
+            utilisateur["dernier_jour"] = jour + 1 if jour < len(pratiques) else jour
+            return redirect(url_for("pratique"))
 
-    return render_template("index.html", jour=jour, pratique=pratique, deja_fait=deja_fait)
+    gamification = (jour == 7)
+    feedbacks = utilisateur["feedbacks"].get(str(jour), [])
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    return render_template("pratique.html", day=jour, practice=pratique_du_jour, gamification=gamification, feedbacks=feedbacks)
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
