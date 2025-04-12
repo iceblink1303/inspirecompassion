@@ -39,16 +39,18 @@ def load_recompenses():
 pratiques = load_pratiques()
 recompenses = load_recompenses()
 
-@app.route("/", methods=["GET", "POST"])
+@app.route('/', methods=['GET', 'POST'])
 def accueil():
-    if request.method == "POST":
-        pseudo = request.form["pseudo"]
-        data = charger_utilisateurs()
-        if pseudo not in data:
-            data[pseudo] = {"jour": 0, "last_date": None, "feedbacks": []}
-            sauvegarder_utilisateurs(data)
-        return redirect(url_for("pratique", pseudo=pseudo))
-    return render_template("accueil.html")
+    if request.method == 'POST':
+        username = request.form['username']
+        already_visited = request.form.get('already_visited') == 'yes'
+        current_day = int(request.form.get('current_day', 1)) if already_visited else 1
+
+        # Enregistre le nouvel utilisateur avec ce jour
+        save_user_data(username, current_day)
+
+        return redirect(url_for('pratique', username=username))
+    return render_template('accueil.html')
 
 @app.route("/pratique/<pseudo>", methods=["GET", "POST"])
 def pratique(pseudo):
