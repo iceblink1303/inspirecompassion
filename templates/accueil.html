@@ -9,13 +9,44 @@
   <div class="container">
     <h1>Bienvenue dans ton espace d'autocompassion</h1>
     <p class="intro">
-      Ce programme te propose un rendez-vous quotidien avec toi-même. Chaque jour, tu découvriras une brève inspiration et une pratique concrète pour cultiver la douceur intérieure.
+      Ce programme te propose un rendez-vous quotidien avec toi-même. Chaque jour, tu découvriras une brève inspiration et une pratique concrète pour cultiver la bienveillance intérieure.
     </p>
-    <form method="POST">
-      <label for="pseudo">Quel est ton surnom ?</label>
-      <input type="text" name="pseudo" required>
-      <button type="submit">Commencer</button>
-    </form>
-  </div>
+<form method="POST">
+    <label for="username"><strong>Quel est ton surnom ?</strong></label>
+    <input type="text" id="username" name="username" required>
+
+    <br><br>
+
+    <label><strong>Es-tu déjà venu•e ?</strong></label><br>
+    <input type="radio" id="yes" name="already_visited" value="yes">
+    <label for="yes">Oui</label><br>
+    <input type="radio" id="no" name="already_visited" value="no" checked>
+    <label for="no">Non</label>
+
+    <br><br>
+
+    <div id="day_input" style="display: none;">
+        <label for="current_day"><strong>À quel jour t’es-tu arrêté•e ?</strong></label>
+        <input type="number" id="current_day" name="current_day" min="1" max="66">
+    </div>
+
+    <br>
+    <button type="submit">Commencer</button>
+</form>
+
+<script>
+    const radios = document.getElementsByName('already_visited');
+    const dayInput = document.getElementById('day_input');
+
+    radios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (document.getElementById('yes').checked) {
+                dayInput.style.display = 'block';
+            } else {
+                dayInput.style.display = 'none';
+            }
+        });
+    });
+</script>
 </body>
 </html>
