@@ -21,12 +21,9 @@ def sauvegarder_utilisateurs(data):
 def charger_pratique(jour):
     try:
         with open(PRATIQUES_FILE, "r", encoding="utf-8") as f:
-            blocs = f.read().split("---
----
-")
+            blocs = f.read().split("------")
         if jour <= len(blocs):
-            sections = blocs[jour - 1].strip().split("---
-")
+            sections = blocs[jour - 1].strip().split("---")
             titre = sections[0].strip() if len(sections) > 0 else "Sans titre"
             intro = sections[1].strip() if len(sections) > 1 else ""
             pratique = sections[2].strip() if len(sections) > 2 else ""
