@@ -2,17 +2,21 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Pratique du jour</title>
+  <title>{{ titre }}</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
   <div class="container">
-    <h2>Jour {{ jour }}</h2>
+    <h1 class="page-title">{{ titre }}</h1>
+
     <div class="bloc-intro">
-      <pre>{{ intro }}</pre>
+      <h2 class="section-title">Inspiration du jour</h2>
+      <p class="intro-text" style="white-space: pre-line;">{{ intro }}</p>
     </div>
+
     <div class="bloc-pratique">
-      <p><strong>Pratique :</strong> {{ pratique }}</p>
+      <h2 class="section-title">Pratique proposée</h2>
+      <p class="practice-text" style="white-space: pre-line;">{{ pratique }}</p>
     </div>
 
     {% if recompense %}
@@ -22,9 +26,9 @@
       </div>
     {% endif %}
 
-    <form method="POST">
+    <form method="POST" class="feedback-form">
       <label for="feedback">Souhaites-tu noter quelque chose ?</label><br>
-      <textarea name="feedback" rows="4"></textarea><br>
+      <textarea name="feedback" rows="4" required></textarea><br>
       <button type="submit">Envoyer</button>
     </form>
   </div>

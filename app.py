@@ -5,6 +5,8 @@ import json
 
 app = Flask(__name__)
 DATA_FILE = "utilisateurs.json"
+PRATIQUES_FILE = "pratiques.txt"
+RECOMPENSES_FILE = "recompenses.txt"
 
 def charger_utilisateurs():
     if os.path.exists(DATA_FILE):
@@ -16,19 +18,29 @@ def sauvegarder_utilisateurs(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
-def load_pratiques():
-    pratiques = []
-    with open("pratiques_autocompassion_par_niveaux.txt", encoding="utf-8") as f:
-        for line in f:
-            if "||" in line:
-                intro, pratique = line.strip().split("||")
-                pratiques.append((intro.replace("\\n", "\n"), pratique))
-    return pratiques
+def charger_pratique(jour):
+    try:
+        with open(PRATIQUES_FILE, "r", encoding="utf-8") as f:
+            blocs = f.read().split("---
+---
+")
+        if jour <= len(blocs):
+            sections = blocs[jour - 1].strip().split("---
+")
+            titre = sections[0].strip() if len(sections) > 0 else "Sans titre"
+            intro = sections[1].strip() if len(sections) > 1 else ""
+            pratique = sections[2].strip() if len(sections) > 2 else ""
+            return titre, intro, pratique
+        else:
+            return "Félicitations 🎉", "Tu as terminé toutes les pratiques !", ""
+    except Exception as e:
+        print(f"Erreur dans charger_pratique : {e}")
+        return "Erreur", "Impossible de charger la pratique.", ""
 
 def load_recompenses():
     recompenses = {}
-    if os.path.exists("recompenses.txt"):
-        with open("recompenses.txt", encoding="utf-8") as f:
+    if os.path.exists(RECOMPENSES_FILE):
+        with open(RECOMPENSES_FILE, encoding="utf-8") as f:
             for line in f:
                 parts = line.strip().split("||")
                 if len(parts) == 3:
@@ -36,32 +48,30 @@ def load_recompenses():
                     recompenses[int(jour)] = {"texte": texte, "lien": lien}
     return recompenses
 
-pratiques = load_pratiques()
 recompenses = load_recompenses()
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route("/", methods=["GET", "POST"])
 def accueil():
-    if request.method == 'POST':
-        username = request.form['username']
-        already_visited = request.form.get('already_visited') == 'yes'
-        current_day = int(request.form.get('current_day', 1)) if already_visited else 1
-
-        # Enregistre le nouvel utilisateur avec ce jour
-        save_user_data(username, current_day)
-
-        return redirect(url_for('pratique', username=username))
-    return render_template('accueil.html')
+    if request.method == "POST":
+        pseudo = request.form["pseudo"]
+        data = charger_utilisateurs()
+        if pseudo not in data:
+            data[pseudo] = {"jour": 0, "last_date": None, "feedbacks": []}
+            sauvegarder_utilisateurs(data)
+        return redirect(url_for("pratique", pseudo=pseudo))
+    return render_template("accueil.html")
 
 @app.route("/pratique/<pseudo>", methods=["GET", "POST"])
 def pratique(pseudo):
     data = charger_utilisateurs()
     if pseudo not in data:
         return redirect(url_for("accueil"))
+
     utilisateur = data[pseudo]
     today = datetime.date.today().isoformat()
-
     jour = utilisateur["jour"]
-    intro, pratique = pratiques[min(jour, len(pratiques)-1)]
+
+    titre, intro, contenu_pratique = charger_pratique(jour + 1)
     recompense = recompenses.get(jour + 1, None)
 
     if request.method == "POST":
@@ -75,4 +85,7 @@ def pratique(pseudo):
         sauvegarder_utilisateurs(data)
         return redirect(url_for("pratique", pseudo=pseudo))
 
-    return render_template("pratique.html", jour=jour+1, intro=intro, pratique=pratique, recompense=recompense)
+    return render_template("pratique.html", jour=jour + 1, titre=titre, intro=intro, pratique=contenu_pratique, recompense=recompense, pseudo=pseudo)
+
+if __name__ == "__main__":
+    app.run(debug=True)
