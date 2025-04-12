@@ -1,49 +1,41 @@
-
+@import url('https://fonts.googleapis.com/css2?family=OpenDyslexic&display=swap');
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f2fdf5;
-    color: #2f4f2f;
-    margin: 0;
-    padding: 0;
+  font-family: 'OpenDyslexic', Arial, sans-serif;
+  background: url('/static/lotus-bg.png') repeat;
+  background-color: #f0fdf4;
+  color: #14532d;
+  padding: 2rem;
 }
 .container {
-    max-width: 600px;
-    margin: 3em auto;
-    padding: 2em;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+  background-color: rgba(255,255,255,0.9);
+  padding: 2rem;
+  border-radius: 1rem;
+  max-width: 700px;
+  margin: auto;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
-h1, h2 {
-    color: #3a7f59;
-}
-label, p, li {
-    font-size: 1.1em;
-    margin-top: 1em;
-}
-input, textarea, select, button {
-    width: 100%;
-    padding: 0.6em;
-    margin-top: 0.5em;
-    border: 1px solid #cde3d1;
-    border-radius: 8px;
+textarea, input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
 }
 button {
-    background-color: #a5d6a7;
-    border: none;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
+  margin-top: 1rem;
+  padding: 0.7rem 2rem;
+  background-color: #81c784;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: bold;
 }
-button:hover {
-    background-color: #81c784;
+pre {
+  white-space: pre-wrap;
+  font-family: 'OpenDyslexic', Arial, sans-serif;
 }
-.gamification {
-    background-color: #e8f5e9;
-    padding: 1em;
-    margin-top: 2em;
-    border-left: 4px solid #66bb6a;
-}
-.feedbacks {
-    margin-top: 2em;
+.recompense {
+  background: #e0f2f1;
+  padding: 1rem;
+  border-left: 5px solid #4db6ac;
+  margin: 1rem 0;
 }

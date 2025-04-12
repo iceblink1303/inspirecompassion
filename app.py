@@ -1,78 +1,76 @@
-from flask import Flask, render_template, request, redirect, url_for, session
-from datetime import datetime
+from flask import Flask, render_template, request, redirect, url_for
 import os
+import datetime
 import json
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "votre_cle_secrete_a_changer")
+DATA_FILE = "utilisateurs.json"
 
-# Charger les pratiques depuis un fichier texte
-with open("pratiques_autocompassion_par_niveaux.txt", "r", encoding="utf-8") as f:
-    pratiques = [ligne.strip() for ligne in f.readlines() if ligne.strip()]
+def charger_utilisateurs():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {}
 
-# Fichier JSON pour enregistrer les utilisateurs
-UTILISATEURS_FILE = "utilisateurs.json"
+def sauvegarder_utilisateurs(data):
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
-# Charger ou initialiser les utilisateurs
-if os.path.exists(UTILISATEURS_FILE):
-    with open(UTILISATEURS_FILE, "r", encoding="utf-8") as f:
-        utilisateurs = json.load(f)
-else:
-    utilisateurs = {}
+def load_pratiques():
+    pratiques = []
+    with open("pratiques_autocompassion_par_niveaux.txt", encoding="utf-8") as f:
+        for line in f:
+            if "||" in line:
+                intro, pratique = line.strip().split("||")
+                pratiques.append((intro.replace("\\n", "\n"), pratique))
+    return pratiques
 
-def sauvegarder_utilisateurs():
-    with open(UTILISATEURS_FILE, "w", encoding="utf-8") as f:
-        json.dump(utilisateurs, f, indent=2, ensure_ascii=False)
+def load_recompenses():
+    recompenses = {}
+    if os.path.exists("recompenses.txt"):
+        with open("recompenses.txt", encoding="utf-8") as f:
+            for line in f:
+                parts = line.strip().split("||")
+                if len(parts) == 3:
+                    jour, texte, lien = parts
+                    recompenses[int(jour)] = {"texte": texte, "lien": lien}
+    return recompenses
+
+pratiques = load_pratiques()
+recompenses = load_recompenses()
 
 @app.route("/", methods=["GET", "POST"])
 def accueil():
     if request.method == "POST":
-        surnom = request.form.get("username", "").strip().lower()
-        est_revenu = request.form.get("visited") == "oui"
-        jour_saisi = request.form.get("last_day")
-
-        if surnom:
-            if surnom not in utilisateurs:
-                utilisateurs[surnom] = {
-                    "dernier_jour": int(jour_saisi) if jour_saisi else 1,
-                    "feedbacks": {}
-                }
-            else:
-                if jour_saisi:
-                    utilisateurs[surnom]["dernier_jour"] = int(jour_saisi)
-
-            sauvegarder_utilisateurs()
-            session["surnom"] = surnom
-            return redirect(url_for("pratique"))
-
+        pseudo = request.form["pseudo"]
+        data = charger_utilisateurs()
+        if pseudo not in data:
+            data[pseudo] = {"jour": 0, "last_date": None, "feedbacks": []}
+            sauvegarder_utilisateurs(data)
+        return redirect(url_for("pratique", pseudo=pseudo))
     return render_template("accueil.html")
 
-@app.route("/pratique", methods=["GET", "POST"])
-def pratique():
-    surnom = session.get("surnom")
-    if not surnom or surnom not in utilisateurs:
+@app.route("/pratique/<pseudo>", methods=["GET", "POST"])
+def pratique(pseudo):
+    data = charger_utilisateurs()
+    if pseudo not in data:
         return redirect(url_for("accueil"))
+    utilisateur = data[pseudo]
+    today = datetime.date.today().isoformat()
 
-    utilisateur = utilisateurs[surnom]
-    jour = utilisateur["dernier_jour"]
-    pratique_du_jour = pratiques[jour - 1] if jour <= len(pratiques) else "Tu as complété toutes les pratiques !"
+    jour = utilisateur["jour"]
+    intro, pratique = pratiques[min(jour, len(pratiques)-1)]
+    recompense = recompenses.get(jour + 1, None)
 
     if request.method == "POST":
         feedback = request.form.get("feedback", "").strip()
-        horodatage = datetime.now().strftime("%Y-%m-%d %H:%M")
         if feedback:
-            utilisateur["feedbacks"].setdefault(str(jour), []).append({
-                "texte": feedback,
-                "date": horodatage
-            })
-            sauvegarder_utilisateurs()
-            utilisateur["dernier_jour"] = jour + 1 if jour < len(pratiques) else jour
-            return redirect(url_for("pratique"))
+            utilisateur["feedbacks"].append((today, feedback))
+        if utilisateur["last_date"] != today:
+            utilisateur["jour"] += 1
+            utilisateur["last_date"] = today
+        data[pseudo] = utilisateur
+        sauvegarder_utilisateurs(data)
+        return redirect(url_for("pratique", pseudo=pseudo))
 
-    gamification = (jour == 7)
-    feedbacks = utilisateur["feedbacks"].get(str(jour), [])
-
-    return render_template("pratique.html", day=jour, practice=pratique_du_jour, gamification=gamification, feedbacks=feedbacks)
-
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    return render_template("pratique.html", jour=jour+1, intro=intro, pratique=pratique, recompense=recompense)

@@ -1,28 +1,21 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Accueil - Pratiques d'autocompassion</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8">
+  <title>Accueil - Autocompassion</title>
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Bienvenue sur le bot d'autocompassion</h1>
-        <form method="POST">
-            <label for="username">Quel est ton surnom ?</label>
-            <input type="text" id="username" name="username" required>
-
-            <label for="visited">Es-tu déjà venu(e) ?</label>
-            <select id="visited" name="visited">
-                <option value="non">Non</option>
-                <option value="oui">Oui</option>
-            </select>
-
-            <label for="last_day">Si oui, à quel jour t'es-tu arrêté(e) ?</label>
-            <input type="number" id="last_day" name="last_day" min="1" max="66">
-
-            <button type="submit">Commencer</button>
-        </form>
-    </div>
+  <div class="container">
+    <h1>Bienvenue dans ton espace d'autocompassion</h1>
+    <p class="intro">
+      Ce programme te propose un rendez-vous quotidien avec toi-même. Chaque jour, tu découvriras une brève inspiration et une pratique concrète pour cultiver la douceur intérieure.
+    </p>
+    <form method="POST">
+      <label for="pseudo">Quel est ton surnom ?</label>
+      <input type="text" name="pseudo" required>
+      <button type="submit">Commencer</button>
+    </form>
+  </div>
 </body>
 </html>
