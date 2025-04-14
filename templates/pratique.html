@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pratique du jour</title>
+    <title>Inspirer la Compassion</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
         <h1>Pratique du jour – Jour {{ jour }}</h1>
 
-        <h2>Texte d'inspiration</h2>
+        <h2>Une notion sur la compassion pour soi</h2>
         <p style="white-space: pre-line;">{{ texte }}</p>
 
-        <h2>Pratique proposée</h2>
+        <h2>Pratique a experimenter aujourd'hui</h2>
         <p style="white-space: pre-line;">{{ pratique }}</p>
 
-        <h2>Comment s'est passée ta pratique ?</h2>
+        <h2>Qu'as tu observé pendant ta pratique ?</h2>
         <form method="post">
             <textarea name="feedback" rows="4" required></textarea><br>
             <button type="submit">Envoyer</button>
@@ -26,7 +26,7 @@
             {% if recompense %}
                 <p><strong>{{ recompense|safe }}</strong></p>
             {% else %}
-                <p>Merci pour ta pratique. Reviens demain pour un nouveau pas vers la compassion.</p>
+                <p>Merci pour ta pratique. Reviens demain pour découvrir un nouveau pas vers la compassion.</p>
             {% endif %}
         </div>
     </div>
