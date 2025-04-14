@@ -1,36 +1,33 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>{{ titre }}</title>
-  <link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <title>Pratique du jour</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div class="container">
-    <h1 class="page-title">{{ titre }}</h1>
+    <div class="container">
+        <h1>Pratique du jour – Jour {{ jour }}</h1>
 
-    <div class="bloc-intro">
-      <h2 class="section-title">Inspiration du jour</h2>
-      <p class="intro-text" style="white-space: pre-line;">{{ intro }}</p>
+        <h2>Texte d'inspiration</h2>
+        <p style="white-space: pre-line;">{{ texte }}</p>
+
+        <h2>Pratique proposée</h2>
+        <p style="white-space: pre-line;">{{ pratique }}</p>
+
+        <h2>Comment s'est passée ta pratique ?</h2>
+        <form method="post">
+            <textarea name="feedback" rows="4" required></textarea><br>
+            <button type="submit">Envoyer</button>
+        </form>
+
+        <div class="recompense" style="margin-top:2rem;">
+            {% if recompense %}
+                <p><strong>{{ recompense|safe }}</strong></p>
+            {% else %}
+                <p>Merci pour ta pratique. Reviens demain pour un nouveau pas vers la compassion.</p>
+            {% endif %}
+        </div>
     </div>
-
-    <div class="bloc-pratique">
-      <h2 class="section-title">Pratique proposée</h2>
-      <p class="practice-text" style="white-space: pre-line;">{{ pratique }}</p>
-    </div>
-
-    {% if recompense %}
-      <div class="recompense">
-        <p><strong>{{ recompense["texte"] }}</strong></p>
-        <a href="{{ recompense['lien'] }}" target="_blank">Voir la ressource</a>
-      </div>
-    {% endif %}
-
-    <form method="POST" class="feedback-form">
-      <label for="feedback">Souhaites-tu noter quelque chose ?</label><br>
-      <textarea name="feedback" rows="4" required></textarea><br>
-      <button type="submit">Envoyer</button>
-    </form>
-  </div>
 </body>
 </html>

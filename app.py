@@ -1,88 +1,57 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
+from datetime import datetime
 import os
-import datetime
-import json
 
 app = Flask(__name__)
-DATA_FILE = "utilisateurs.json"
-PRATIQUES_FILE = "pratiques.txt"
-RECOMPENSES_FILE = "recompenses.txt"
+app.secret_key = "ta_cle_secrete"
 
-def charger_utilisateurs():
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {}
-
-def sauvegarder_utilisateurs(data):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-
-def charger_pratique(jour):
+def lire_ligne_fichier(nom_fichier, index):
     try:
-        with open(PRATIQUES_FILE, "r", encoding="utf-8") as f:
-            blocs = f.read().split("------")
-        if jour <= len(blocs):
-            sections = blocs[jour - 1].strip().split("---")
-            titre = sections[0].strip() if len(sections) > 0 else "Sans titre"
-            intro = sections[1].strip() if len(sections) > 1 else ""
-            pratique = sections[2].strip() if len(sections) > 2 else ""
-            return titre, intro, pratique
-        else:
-            return "Félicitations 🎉", "Tu as terminé toutes les pratiques !", ""
+        with open(nom_fichier, 'r', encoding='utf-8') as f:
+            lignes = f.readlines()
+            if 0 <= index < len(lignes):
+                return lignes[index].strip()
     except Exception as e:
-        print(f"Erreur dans charger_pratique : {e}")
-        return "Erreur", "Impossible de charger la pratique.", ""
+        print(f"Erreur lecture fichier {nom_fichier} : {e}")
+    return "Contenu non disponible."
 
-def load_recompenses():
-    recompenses = {}
-    if os.path.exists(RECOMPENSES_FILE):
-        with open(RECOMPENSES_FILE, encoding="utf-8") as f:
-            for line in f:
-                parts = line.strip().split("||")
-                if len(parts) == 3:
-                    jour, texte, lien = parts
-                    recompenses[int(jour)] = {"texte": texte, "lien": lien}
-    return recompenses
+def lire_recompense(jour):
+    try:
+        with open('recompenses.txt', 'r', encoding='utf-8') as f:
+            for ligne in f:
+                if ligne.startswith(f"{jour}||"):
+                    return ligne.strip().split("||", 1)[1]
+    except:
+        pass
+    return None
 
-recompenses = load_recompenses()
-
-@app.route("/", methods=["GET", "POST"])
+@app.route('/', methods=['GET', 'POST'])
 def accueil():
-    if request.method == "POST":
-        pseudo = request.form["pseudo"]
-        data = charger_utilisateurs()
-        if pseudo not in data:
-            data[pseudo] = {"jour": 0, "last_date": None, "feedbacks": []}
-            sauvegarder_utilisateurs(data)
-        return redirect(url_for("pratique", pseudo=pseudo))
-    return render_template("accueil.html")
+    if request.method == 'POST':
+        session['surnom'] = request.form['surnom']
+        session['deja_venu'] = request.form.get('deja_venu', 'non')
+        session['jour_arret'] = int(request.form.get('jour_arret') or 1)
+        return redirect(url_for('pratique'))
+    return render_template('accueil.html')
 
-@app.route("/pratique/<pseudo>", methods=["GET", "POST"])
-def pratique(pseudo):
-    data = charger_utilisateurs()
-    if pseudo not in data:
-        return redirect(url_for("accueil"))
+@app.route('/pratique', methods=['GET', 'POST'])
+def pratique():
+    surnom = session.get('surnom', 'ami')
+    jour = session.get('jour_arret', 1)
 
-    utilisateur = data[pseudo]
-    today = datetime.date.today().isoformat()
-    jour = utilisateur["jour"]
+    texte = lire_ligne_fichier('textes.txt', jour - 1)
+    pratique = lire_ligne_fichier('pratiques.txt', jour - 1)
+    recompense = lire_recompense(jour)
 
-    titre, intro, contenu_pratique = charger_pratique(jour + 1)
-    recompense = recompenses.get(jour + 1, None)
-
-    if request.method == "POST":
-        feedback = request.form.get("feedback", "").strip()
+    if request.method == 'POST':
+        feedback = request.form.get('feedback', '').strip()
         if feedback:
-            utilisateur["feedbacks"].append((today, feedback))
-        if utilisateur["last_date"] != today:
-            utilisateur["jour"] += 1
-            utilisateur["last_date"] = today
-        data[pseudo] = utilisateur
-        sauvegarder_utilisateurs(data)
-        return redirect(url_for("pratique", pseudo=pseudo))
+            with open('feedback.txt', 'a', encoding='utf-8') as f:
+                f.write(f"{datetime.now()} | {surnom} | Jour {jour} | {feedback}\n")
+        session['jour_arret'] = jour + 1
+        return redirect(url_for('pratique'))
 
-    return render_template("pratique.html", jour=jour + 1, titre=titre, intro=intro, pratique=contenu_pratique, recompense=recompense, pseudo=pseudo)
+    return render_template('pratique.html', jour=jour, texte=texte, pratique=pratique, recompense=recompense)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
