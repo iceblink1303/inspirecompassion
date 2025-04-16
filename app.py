@@ -43,12 +43,14 @@ def pratique():
     pratique = lire_ligne_fichier('pratiques.txt', jour - 1)
     recompense = lire_recompense(jour)
 
-    if request.method == 'POST':
-        feedback = request.form.get('feedback', '').strip()
-        if feedback:
-            with open('feedback.txt', 'a', encoding='utf-8') as f:
-                f.write(f"{datetime.now()} | {surnom} | Jour {jour} | {feedback}\n")
-        session['jour_arret'] = jour + 1
+  if request.method == 'POST':
+    feedback = request.form.get('feedback', '').strip()
+    if feedback:
+        with open('feedback.txt', 'a', encoding='utf-8') as f:
+            f.write(f"{datetime.now()} | {surnom} | Jour {jour} | {feedback}\n")
+
+        # ✅ LOG dans la console Render
+        print(f"[FEEDBACK] {datetime.now()} | {surnom} | Jour {jour} | {feedback}")
         return redirect(url_for('pratique'))
 
     return render_template('pratique.html', jour=jour, texte=texte, pratique=pratique, recompense=recompense)
