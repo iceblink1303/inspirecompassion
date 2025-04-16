@@ -53,5 +53,14 @@ def pratique():
 
     return render_template('pratique.html', jour=jour, texte=texte, pratique=pratique, recompense=recompense)
 
+@app.route('/voir-feedbacks')
+def voir_feedbacks():
+    try:
+        with open('feedback.txt', 'r', encoding='utf-8') as f:
+            lignes = f.readlines()
+        return "<br>".join(lignes)
+    except Exception as e:
+        return f"Erreur : {e}"
+
 if __name__ == '__main__':
     app.run(debug=True)
