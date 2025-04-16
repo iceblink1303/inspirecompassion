@@ -1,13 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from datetime import datetime
-import os
 
 app = Flask(__name__)
 app.secret_key = "ta_cle_secrete"
 
 def lire_ligne_fichier(nom_fichier, index):
     try:
-        with open(nom_fichier, 'r', encoding='utf-8') as f:
+        with open(nom_fichier, ' encoding='utf-8') as f:
             lignes = f.readlines()
             if 0 <= index < len(lignes):
                 return lignes[index].strip()
@@ -41,28 +40,34 @@ def pratique():
 
     texte = lire_ligne_fichier('textes.txt', jour - 1)
     pratique = lire_ligne_fichier('pratiques.txt', jour - 1)
-    recompense = lire_recompense(jour)
 
-  if request.method == 'POST':
-    feedback = request.form.get('feedback', '').strip()
-    if feedback:
-        with open('feedback.txt', 'a', encoding='utf-8') as f:
-            f.write(f"{datetime.now()} | {surnom} | Jour {jour} | {feedback}\n")
+    if request.method == 'POST':
+        feedback = request.form.get('feedback', '').strip()
+        if feedback:
+            log_entry = f"{datetime.now()} | {surnom} | Jour {jour} | {feedback}"
+            print(f"[FEEDBACK] {log_entry}")
+            with open('feedback.txt', 'a', encoding='utf-8') as f:
+                f.write(log_entry + "\n")
+        session['jour_arret'] = jour + 1
+        return redirect(url_for('merci'))
 
-        # ✅ LOG dans la console Render
-        print(f"[FEEDBACK] {datetime.now()} | {surnom} | Jour {jour} | {feedback}")
-        return redirect(url_for('pratique'))
+    return render_template('pratique.html', jour=jour, texte=texte, pratique=pratique)
 
-    return render_template('pratique.html', jour=jour, texte=texte, pratique=pratique, recompense=recompense)
+@app.route('/merci')
+def merci():
+    surnom = session.get('surnom', 'ami')
+    jour = session.get('jour_arret', 1)
+    recompense = lire_recompense(jour - 1)
+    return render_template('merci.html', surnom=surnom, jour=jour - 1, recompense=recompense)
 
 @app.route('/voir-feedbacks')
 def voir_feedbacks():
     try:
         with open('feedback.txt', 'r', encoding='utf-8') as f:
             lignes = f.readlines()
-        return "<br>".join(lignes)
+        return "<h1>Feedbacks enregistrés</h1><br><br>" + "<br>".join(lignes)
     except Exception as e:
-        return f"Erreur : {e}"
+        return f"<p>Erreur : {e}</p>"
 
 if __name__ == '__main__':
     app.run(debug=True)
