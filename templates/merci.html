@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merci pour ta pratique</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            background-color: #f0faf0;
+            color: #023020;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 2rem 1rem;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 0 10px rgba(0, 80, 0, 0.05);
+            text-align: center;
+        }
+        h1 {
+            font-size: 1.8rem;
+        }
+        h2 {
+            font-size: 1.2rem;
+            margin-top: 1rem;
+        }
+        .recompense {
+            margin-top: 2rem;
+            background-color: #e0fce0;
+            padding: 1rem;
+            border-left: 5px solid #99cc99;
+            border-radius: 8px;
+        }
+        button {
+            margin-top: 2rem;
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #cceacc;
+            color: #023020;
+            font-weight: bold;
+            width: 100%;
+            max-width: 300px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #b2d8b2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Merci {{ surnom }}</h1>
+        <h2>Tu viens de terminer le jour {{ jour }}</h2>
+
+        <div class="recompense">
+            {% if recompense %}
+                <p><strong>{{ recompense|safe }}</strong></p>
+            {% else %}
+                <p>Merci pour ta pratique. Reviens demain pour continuer ton chemin de douceur.</p>
+            {% endif %}
+        </div>
+
+        <a href="{{ url_for('accueil') }}">
+            <button>Retour à l’accueil</button>
+        </a>
+    </div>
+</body>
+</html>

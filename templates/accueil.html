@@ -3,28 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inspirer la Compassion</title>
+    <title>Accueil</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>Ceci est un espace d'exploration de la compassion pour soi</h1>
-        <p>Bienvenue! Chaque jour, découvre une brève inspiration et une pratique simple pour cultiver progressivement ton autocompassion. Ce projet est une experimentation basee sur les travaux de Kristin Neff et Paul Gilbert et sur ma propre experience. Tous tes retours sont bienvenus! </p>
-
+        <h1>Bienvenue dans ton espace d’autocompassion</h1>
+        <p>Chaque jour, une inspiration et une pratique pour revenir à toi avec douceur.</p>
         <form method="post">
-            <label for="surnom">Quel est ton surnom ?</label>
+            <label for="surnom">Quel est ton prénom ou ton surnom ?</label>
             <input type="text" name="surnom" id="surnom" required>
 
-            <label for="deja_venu">Es-tu déjà venu•e ?</label>
+            <label for="deja_venu">Es-tu déjà venu(e) ?</label>
             <select name="deja_venu" id="deja_venu">
                 <option value="non">Non</option>
                 <option value="oui">Oui</option>
             </select>
 
-            <label for="jour_arret">À quel jour t'es-tu arrêté•e ?</label>
+            <label for="jour_arret">À quel jour t'es-tu arrêté(e) ?</label>
             <input type="number" name="jour_arret" id="jour_arret" min="1" max="66" placeholder="1">
 
-            <button type="submit">Vers la pratique du jour</button>
+            <button type="submit">Commencer</button>
         </form>
     </div>
 </body>

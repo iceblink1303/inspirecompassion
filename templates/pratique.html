@@ -3,32 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inspirer la Compassion</title>
+    <title>Pratique du jour</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            background-color: #f0faf0;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 1rem;
+            color: #023020;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 0 8px rgba(0, 80, 0, 0.05);
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            padding: 0.7rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 1px solid #b2d8b2;
+        }
+        button {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            background-color: #b2e0b2;
+            color: #023020;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #a0d0a0;
+        }
+        p {
+            white-space: pre-line;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Pratique du jour – Jour {{ jour }}</h1>
 
-        <h2>Une notion sur la compassion pour soi</h2>
-        <p style="white-space: pre-line;">{{ texte }}</p>
+        <h2>Texte d'inspiration</h2>
+        <p>{{ texte }}</p>
 
-        <h2>Pratique a experimenter aujourd'hui</h2>
-        <p style="white-space: pre-line;">{{ pratique }}</p>
+        <h2>Pratique proposée</h2>
+        <p>{{ pratique }}</p>
 
-        <h2>Qu'as tu observé pendant ta pratique ?</h2>
         <form method="post">
-            <textarea name="feedback" rows="4" required></textarea><br>
-            <button type="submit">Envoyer</button>
+            <label for="feedback"><strong>Comment s'est passée ta pratique ?</strong></label><br>
+            <textarea name="feedback" id="feedback" rows="5" required></textarea>
+            <button type="submit">Envoyer mon retour</button>
         </form>
-
-        <div class="recompense" style="margin-top:2rem;">
-            {% if recompense %}
-                <p><strong>{{ recompense|safe }}</strong></p>
-            {% else %}
-                <p>Merci pour ta pratique. Reviens demain pour découvrir un nouveau pas vers la compassion.</p>
-            {% endif %}
-        </div>
     </div>
 </body>
 </html>
