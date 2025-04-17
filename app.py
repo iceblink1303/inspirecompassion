@@ -6,7 +6,7 @@ app.secret_key = "ta_cle_secrete"
 
 def lire_ligne_fichier(nom_fichier, index):
     try:
-        with open(nom_fichier, ' encoding='utf-8') as f:
+        with open(nom_fichier, 'r', encoding='utf-8') as f:
             lignes = f.readlines()
             if 0 <= index < len(lignes):
                 return lignes[index].strip()
